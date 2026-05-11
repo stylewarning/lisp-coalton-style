@@ -30,6 +30,32 @@ Do not serially chain `if`. Use `cond`.
 
 Anything exported should be documented with an appropriate docstring.
 
+### Functions in mappers/reducers/etc. should be short
+
+In mappers, reducers, etc., the function expression should preferably
+be short, no more than one, maybe two lines. Factor the function out
+to be a global helper function when possible (prepending its name with
+`%` to indicate it's a local helper), or as a local
+`flet`/`labels`/`let`-`fn` when necessary.
+
+```
+;; yes!
+(defun %solve-quadratic (coeffs)
+  (destructuring-bind (a b c) coeffs
+    (/ (+ (- b) (sqrt (- (* b b) (* 4 a c))))
+       (* 2 a))))
+
+(defun solve-them (polys)
+  (mapcar #'%solve-quadratic polys))
+
+;; no!
+(defun solve-them (polys)
+  (mapcar (lambda (coeffs)
+            (destructuring-bind (a b c) coeffs
+              (/ (+ (- b) (sqrt (- (* b b) (* 4 a c))))
+                 (* 2 a))))
+          polys))
+```
 
 ## Common Lisp
 
